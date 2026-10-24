@@ -7,9 +7,13 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
-    {
-        $this->call([
-            BeritaSeeder::class,
-        ]);
-    }
+{
+    $this->call([
+        UserSeeder::class,
+        KategoriSeeder::class,
+        TagSeeder::class,
+        BeritaSeeder::class,
+    ]);
+}
+    
 }

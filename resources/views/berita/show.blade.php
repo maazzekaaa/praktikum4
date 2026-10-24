@@ -3,7 +3,7 @@
 @section('title', $berita->judul . ' - Portal Resmi Desa Jalatrang')
 
 @section('content')
-<!-- Breadcrumb Navigasi -->
+
 <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb small bg-transparent p-0 mb-2">
         <li class="breadcrumb-item">
@@ -23,27 +23,26 @@
 </nav>
 
 <div class="row g-4">
-    <!-- Konten Berita Utama (Kiri) -->
+
     <div class="col-lg-8">
         <article class="card border-0 shadow-sm rounded-3 p-4 bg-white">
             
-            <!-- Category Badge & Headline Title -->
-            <div class="mb-2">
-                <span class="badge bg-primary px-3 py-2 fs-6 fw-semibold rounded-2" style="background-color: #0f2b48 !important;">
-                    {{ $berita->kategori }}
-                </span>
+            <span class="badge badge-kategori text-white mb-2" style="width: fit-content;">{{ $berita->kategori->nama ?? 'Umum' }}</span>
+
+            <h2 class="mt-2 fw-bold text-dark">{{ $berita->judul }}</h2>
+
+            <div class="mb-3">
+                @foreach ($berita->tags as $tag)
+                    <a href="{{ route('berita.index', ['tag' => $tag->id]) }}"
+                       class="tag-pill text-decoration-none me-1">#{{ $tag->nama }}</a>
+                @endforeach
             </div>
 
-            <h1 class="fw-bold text-dark lh-sm my-3 fs-3">
-                {{ $berita->judul }}
-            </h1>
-
-            <!-- Meta Author, Date & Views -->
             <div class="d-flex flex-wrap align-items-center justify-content-between text-muted small py-2 my-2 border-top border-bottom">
                 <div class="d-flex align-items-center gap-3">
                     <span>
                         <i class="bi bi-person-circle me-1 text-primary"></i> 
-                        <strong>{{ $berita->penulis ?? 'Admin Desa' }}</strong>
+                        <strong>{{ $berita->user->name }}</strong>
                     </span>
                     <span>
                         <i class="bi bi-calendar3 me-1"></i> 
@@ -51,13 +50,10 @@
                     </span>
                 </div>
                 <div>
-                    <span class="badge bg-light text-dark border">
-                        <i class="bi bi-eye-fill me-1 text-secondary"></i> {{ $berita->dilihat ?? 0 }} kali dibaca
-                    </span>
+                    <span class="text-muted"><i class="bi bi-eye me-1"></i> {{ $berita->dilihat ?? 0 }} kali dilihat</span>
                 </div>
             </div>
 
-            <!-- Featured Image -->
             <div class="my-3 text-center">
                 <img 
                     src="{{ $berita->gambar ? asset('storage/' . $berita->gambar) : 'https://placehold.co/800x450?text=Portal+Berita+Desa+Jalatrang' }}" 
@@ -73,28 +69,22 @@
                 @endif
             </div>
 
-            <!-- Body Text / Isi Berita -->
             <div class="article-body lh-lg text-secondary fs-6 mt-3" style="text-align: justify; white-space: pre-line;">
                 {!! e($berita->isi) !!}
             </div>
 
-            <!-- Tags Section -->
             <div class="mt-4 pt-3 border-top">
                 <span class="fw-bold small text-dark me-2">
                     <i class="bi bi-tags-fill me-1"></i> Tag:
                 </span>
-                <a href="{{ route('berita.index', ['kategori' => $berita->kategori]) }}" class="badge bg-light text-secondary text-decoration-none border me-1">
-                    #{{ Str::slug($berita->kategori) }}
+                <a href="{{ route('berita.index', ['kategori' => $berita->kategori_id]) }}" class="badge bg-light text-secondary text-decoration-none border me-1">
+                    #{{ Str::slug($berita->kategori->nama ?? 'umum') }}
                 </a>
                 <a href="{{ route('berita.index') }}" class="badge bg-light text-secondary text-decoration-none border me-1">
                     #desajalatrang
                 </a>
-                <a href="{{ route('berita.index') }}" class="badge bg-light text-secondary text-decoration-none border">
-                    #cipaku
-                </a>
             </div>
 
-            <!-- Back Button -->
             <div class="mt-4 d-flex justify-content-between align-items-center">
                 <a href="{{ route('berita.index') }}" class="btn btn-outline-primary btn-sm px-3 rounded-2" style="border-color: #0f2b48; color: #0f2b48;">
                     <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Berita
@@ -104,7 +94,6 @@
         </article>
     </div>
 
-    <!-- Sidebar Berita Terkait / Terbaru (Kanan) -->
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white sticky-top" style="top: 90px; z-index: 10;">
             
@@ -130,7 +119,7 @@
                             </div>
                             <div class="col-8">
                                 <span class="badge bg-light text-primary border mb-1" style="font-size: 0.65rem; color: #0f2b48 !important;">
-                                    {{ $item->kategori }}
+                                    {{ $item->kategori->nama ?? 'Umum' }}
                                 </span>
                                 <h6 class="fw-bold mb-1 text-dark lh-sm" style="font-size: 0.825rem;">
                                     {{ Str::limit($item->judul, 50) }}

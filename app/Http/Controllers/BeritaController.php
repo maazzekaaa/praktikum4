@@ -3,136 +3,119 @@
 namespace App\Http\Controllers;
 
 use App\Models\Berita;
+use App\Models\Kategori;
+use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
 class BeritaController extends Controller
 {
-    /**
-     * Menampilkan daftar berita beserta fitur pencarian dan filter
-     */
+
     public function index(Request $request)
     {
-        $query = Berita::query();
+        $beritas = Berita::with(['kategori', 'tags'])
+            ->when($request->kata_kunci, function ($q, $kata) {
+                $q->where('judul', 'like', "%{$kata}%");
+            })
+            ->when($request->kategori, function ($q, $id) {
+                $q->where('kategori_id', $id);
+            })
+            ->when($request->tag, function ($q, $id) {
+                $q->whereHas('tags', fn ($t) => $t->where('tags.id', $id));
+            })
+            ->latest()
+            ->paginate(6)
+            ->withQueryString();
 
-        if ($request->filled('kata_kunci')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('judul', 'like', '%' . $request->kata_kunci . '%')
-                  ->orWhere('isi', 'like', '%' . $request->kata_kunci . '%');
-            });
-        }
+        $kategoris = Kategori::orderBy('nama')->get();
 
-        if ($request->filled('kategori')) {
-            $query->where('kategori', $request->kategori);
-        }
-
-        $beritas = $query->latest()->paginate(6)->withQueryString();
-
-        return view('berita.index', compact('beritas'));
+        return view('berita.index', compact('beritas', 'kategoris'));
     }
 
-    /**
-     * Menampilkan form tambah berita baru
-     */
     public function create()
     {
-        return view('berita.create');
+        return view('berita.create', [
+            'kategoris' => Kategori::orderBy('nama')->get(),
+            'tags'      => Tag::orderBy('nama')->get(),
+        ]);
     }
 
-    /**
-     * Menyimpan data berita baru ke storage public dan database
-     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'judul'    => 'required|string|max:255',
-            'kategori' => 'required|string',
-            'isi'      => 'required|string',
-            'gambar'   => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'penulis'  => 'nullable|string',
+        $data = $request->validate([
+            'judul'       => 'required|max:255',
+            'kategori_id' => 'required|exists:kategoris,id',
+            'isi'         => 'required|min:10',
+            'gambar'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'tags'        => 'nullable|array',
+            'tags.*'      => 'exists:tags,id',
         ]);
 
         if ($request->hasFile('gambar')) {
-            $file = $request->file('gambar');
-            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
-            
-            // Menyimpan gambar dengan menegaskan disk 'public'
-            $file->storeAs('', $filename, 'public');
-            $validated['gambar'] = $filename;
+            $data['gambar'] = $request->file('gambar')->store('berita', 'public');
         }
 
-        $validated['penulis'] = $request->input('penulis', 'Admin');
-        $validated['dilihat'] = 0;
+        $berita = $request->user()->beritas()->create(Arr::except($data, 'tags'));
+        $berita->tags()->sync($data['tags'] ?? []);
 
-        Berita::create($validated);
-
-        return redirect()->route('berita.index')->with('success', 'Berita berhasil ditambahkan!');
+        return redirect()->route('berita.index')
+            ->with('success', 'Berita berhasil ditambahkan!');
     }
 
-    /**
-     * Menampilkan halaman detail berita
-     */
     public function show(Berita $berita)
     {
         $berita->increment('dilihat');
+        $berita->load(['kategori', 'tags', 'user']);
 
-        $beritaTerkait = Berita::where('kategori', $berita->kategori)
-                               ->where('id', '!=', $berita->id)
-                               ->take(3)
-                               ->get();
-
-        return view('berita.show', compact('berita', 'beritaTerkait'));
+        return view('berita.show', compact('berita'));
     }
 
-    /**
-     * Menampilkan form edit berita
-     */
     public function edit(Berita $berita)
     {
-        return view('berita.edit', compact('berita'));
+        return view('berita.edit', [
+            'berita'    => $berita->load('tags'),
+            'kategoris' => Kategori::orderBy('nama')->get(),
+            'tags'      => Tag::orderBy('nama')->get(),
+        ]);
     }
 
-    /**
-     * Memperbarui data berita di database
-     */
     public function update(Request $request, Berita $berita)
     {
-        $validated = $request->validate([
-            'judul'    => 'required|string|max:255',
-            'kategori' => 'required|string',
-            'isi'      => 'required|string',
-            'gambar'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'penulis'  => 'nullable|string',
+        $data = $request->validate([
+            'judul'       => 'required|max:255',
+            'kategori_id' => 'required|exists:kategoris,id',
+            'isi'         => 'required|min:10',
+            'gambar'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'tags'        => 'nullable|array',
+            'tags.*'      => 'exists:tags,id',
         ]);
 
         if ($request->hasFile('gambar')) {
-            // Hapus berkas lama dari disk public jika ada
-            if ($berita->gambar && Storage::disk('public')->exists($berita->gambar)) {
+            if ($berita->gambar) {
                 Storage::disk('public')->delete($berita->gambar);
             }
-
-            $file = $request->file('gambar');
-            $filename = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
-            $file->storeAs('', $filename, 'public');
-            $validated['gambar'] = $filename;
+            $data['gambar'] = $request->file('gambar')->store('berita', 'public');
+        } else {
+            unset($data['gambar']);
         }
 
-        $berita->update($validated);
+        $berita->update(Arr::except($data, 'tags'));
+        $berita->tags()->sync($data['tags'] ?? []);
 
-        return redirect()->route('berita.index')->with('success', 'Berita berhasil diperbarui!');
+        return redirect()->route('berita.index')
+            ->with('success', 'Berita berhasil diperbarui!');
     }
 
-    /**
-     * Menghapus berita dari database
-     */
     public function destroy(Berita $berita)
     {
-        if ($berita->gambar && Storage::disk('public')->exists($berita->gambar)) {
+        if ($berita->gambar) {
             Storage::disk('public')->delete($berita->gambar);
         }
 
         $berita->delete();
 
-        return redirect()->route('berita.index')->with('success', 'Berita berhasil dihapus!');
+        return redirect()->route('berita.index')
+            ->with('success', 'Berita berhasil dihapus!');
     }
 }

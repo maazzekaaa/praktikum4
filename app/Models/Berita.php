@@ -1,20 +1,27 @@
 <?php
-
+ 
 namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+ 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+ 
 class Berita extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'judul',
-        'kategori',
-        'isi',
-        'penulis',
-        'gambar',
-        'dilihat'
-    ];
+    protected $fillable = ['user_id','judul','kategori_id','gambar','isi','penulis'];
+ 
+    public function kategori(): BelongsTo
+    {
+        return $this->belongsTo(Kategori::class);
+    }
+ 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+ 
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
+    }
 }

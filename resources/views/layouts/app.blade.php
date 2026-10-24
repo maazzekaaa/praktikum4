@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Berita & Informasi - Desa Jalatrang')</title>
 
-    <!-- FAVICON LOGO LOKAL -->
-    <link rel="icon" type="image/png" href="{{ asset('storage/jalatrang.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('storage/berita/jalatrang.png') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -23,7 +22,6 @@
             overflow-x: clip; 
         }
 
-        /* Top Info Bar & Marquee */
         .top-info-bar { 
             background-color: #0b1e36; 
             color: #ffffff; 
@@ -51,7 +49,6 @@
             100% { transform: translate(-100%, 0); } 
         }
 
-        /* Sticky Header */
         .sticky-jalatrang-header { 
             position: sticky !important; 
             top: 0 !important; 
@@ -90,7 +87,6 @@
             color: #ffffff !important; 
         }
 
-        /* Banner Header Sub Page */
         .page-title-banner-sub { 
             background-color: #08182b; 
             padding: 24px 0; 
@@ -99,7 +95,6 @@
         }
         .page-title-banner-sub h1 { font-size: 1.8rem; font-weight: 800; }
 
-        /* ANIMASI CARD BERITA (SEPERTI WEB ASLI JALATRANG.ID) */
         .card-berita { 
             border: 1px solid #e2e8f0; 
             border-radius: 12px; 
@@ -110,14 +105,12 @@
             position: relative;
         }
 
-        /* Efek Terangkat & Bayangan saat Card Di-hover */
         .card-berita:hover { 
             transform: translateY(-6px); 
             box-shadow: 0 12px 24px -4px rgba(15, 43, 72, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.05); 
             border-color: #cbd5e1;
         }
 
-        /* Container Gambar untuk Zoom Effect */
         .card-berita-img-wrapper {
             overflow: hidden;
             position: relative;
@@ -125,7 +118,6 @@
             background-color: #f1f5f9;
         }
 
-        /* Animasi Perbesaran Gambar (Zoom In) */
         .card-berita-img-wrapper img {
             width: 100%;
             height: 100%;
@@ -137,7 +129,6 @@
             transform: scale(1.08);
         }
 
-        /* Animasi Transisi Warna Judul */
         .card-berita-title {
             font-size: 1rem;
             font-weight: 700;
@@ -150,7 +141,6 @@
             color: #0066ff;
         }
 
-        /* Tombol Baca Selengkapnya dengan Mikro Animasi */
         .btn-baca-outline { 
             color: #0f2b48; 
             border: 1px solid #0f2b48; 
@@ -179,19 +169,25 @@
             transform: translateX(3px);
         }
 
-        /* Footer */
         footer.footer-jalatrang { 
-            background-color: #08182b; 
-            color: #9cb3c9; 
+            background-color: #0b1d33; 
+            color: #94a3b8; 
             margin-top: 60px; 
-            border-top: 4px solid #0f2b48; 
+            border-top: 3px solid #0f2b48; 
+            font-size: 0.85rem;
         }
-        footer.footer-jalatrang a { color: #ffffff; text-decoration: none; }
+        footer.footer-jalatrang a { 
+            color: #94a3b8; 
+            text-decoration: none; 
+            transition: color 0.2s ease-in-out;
+        }
+        footer.footer-jalatrang a:hover { 
+            color: #ffc107 !important;
+        }
     </style>
 </head>
 <body>
 
-    <!-- STICKY HEADER -->
     <div class="sticky-jalatrang-header">
         <div class="top-info-bar">
             <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
@@ -207,15 +203,15 @@
                 </div>
                 <div class="flex-shrink-0 d-none d-md-block text-nowrap" style="color: #d0dfed;">
                     <i class="bi bi-clock me-1"></i> 
-                    {{ date('l, d F Y') }}
+                    {{ now()->translatedFormat('l, d F Y') }}
                 </div>
             </div>
         </div>
 
         <div class="container-fluid px-4 py-2">
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <div class="d-flex align-items-center">
-                    <img src="{{ asset('storage/jalatrang.png') }}" alt="Logo Desa Jalatrang" height="45" class="me-3">
+                <a href="{{ route('berita.index') }}" class="d-flex align-items-center text-decoration-none">
+                    <img src="{{ asset('storage/berita/jalatrang.png') }}" alt="Logo Desa Jalatrang" height="45" class="me-3" onerror="this.onerror=null; this.src='https://placehold.co/45x45?text=Desa';">
                     <div>
                         <div class="header-brand-title">
                             PEMERINTAH DESA JALATRANG
@@ -224,40 +220,28 @@
                             KECAMATAN CIPAKU KABUPATEN CIAMIS
                         </div>
                     </div>
-                </div>
+                </a>
 
-                <ul class="nav nav-jalatrang ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <i class="bi bi-house-door-fill me-1"></i> Profil
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            Kependudukan
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('berita.index') }}">
-                            Berita
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            Potensi Wisata
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            Download
-                        </a>
-                    </li>
-                </ul>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <a href="{{ route('berita.index') }}" class="nav-link text-white d-inline-block active px-3 py-1">Berita</a>
+                 
+                    @auth
+                        <span class="text-white small">
+                            <i class="bi bi-person-circle"></i>
+                            {{ auth()->user()->name }} ({{ auth()->user()->role }})
+                        </span>
+                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-light">Logout</button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="btn btn-sm btn-warning">Login</a>
+                    @endauth
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="main-wrapper">
         <div class="page-title-banner-sub">
             <div class="container">
@@ -265,7 +249,7 @@
                     Beranda / Berita
                 </div>
                 <h1 class="mb-1">
-                    Berita & Informasi
+                    @yield('title', 'Berita & Informasi')
                 </h1>
                 <p class="mb-0" style="color: #9cb3c9;">
                     Informasi terkini dari Desa Jalatrang
@@ -278,29 +262,81 @@
         </main>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="footer-jalatrang py-4">
-        <div class="container text-center text-md-start">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-2">
-                        <img src="{{ asset('storage/jalatrang.png') }}" alt="Logo Desa Jalatrang" height="28">
-                        <strong class="text-white fs-6">
-                            Pemerintah Desa Jalatrang
-                        </strong>
+    <footer class="footer-jalatrang pt-5 pb-4">
+        <div class="container">
+            <div class="row g-4 text-start">
+
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="{{ asset('storage/berita/jalatrang.png') }}" alt="Logo Desa Jalatrang" height="42" class="me-2" onerror="this.onerror=null; this.src='https://placehold.co/42x42?text=Desa';">
+                        <div>
+                            <h6 class="fw-bold mb-0 text-white text-uppercase" style="letter-spacing: 0.5px;">Pemerintah Desa Jalatrang</h6>
+                            <small class="d-block" style="font-size: 0.72rem; color: #94a3b8;">Kecamatan Cipaku, Kabupaten Ciamis</small>
+                        </div>
                     </div>
-                    <small>
-                        Kecamatan Cipaku, Kabupaten Ciamis, Jawa Barat
-                    </small>
-                    <br>
-                    <small class="text-white-50">
-                        &copy; {{ date('Y') }} Desa Jalatrang. All rights reserved.
-                    </small>
+                    <p class="mb-3 lh-sm" style="color: #94a3b8; font-size: 0.8rem;">
+                        Portal resmi pelayanan publik dan media informasi terpadu masyarakat Desa Jalatrang. Mewujudkan tata kelola pemerintahan desa yang transparan, akuntabel, dan mandiri.
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-color: #334155;"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-color: #334155;"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-color: #334155;"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle p-0 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-color: #334155;"><i class="bi bi-whatsapp"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                    <a href="{{ route('berita.index') }}">
-                        <i class="bi bi-newspaper me-1"></i> Portal Berita Desa
-                    </a>
+
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="fw-bold text-white mb-3 pb-1 border-bottom d-inline-block" style="border-color: #334155 !important;">Navigasi</h6>
+                    <ul class="list-unstyled mb-0 d-flex flex-column gap-2" style="font-size: 0.8rem;">
+                        <li><a href="#"><i class="bi bi-chevron-right me-1 small"></i> Profil Desa</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1 small"></i> Kependudukan</a></li>
+                        <li><a href="{{ route('berita.index') }}"><i class="bi bi-chevron-right me-1 small"></i> Berita Desa</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1 small"></i> Potensi Wisata</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right me-1 small"></i> Keuangan Desa</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="fw-bold text-white mb-3 pb-1 border-bottom d-inline-block" style="border-color: #334155 !important;">Layanan Publik</h6>
+                    <ul class="list-unstyled mb-0 d-flex flex-column gap-2" style="font-size: 0.8rem;">
+                        <li><a href="#"><i class="bi bi-box-arrow-up-right me-1 small"></i> Warung Desa Online</a></li>
+                        <li><a href="#"><i class="bi bi-box-arrow-up-right me-1 small"></i> Perpustakaan Selaras</a></li>
+                        <li><a href="#"><i class="bi bi-box-arrow-up-right me-1 small"></i> IDM & SDGs Desa</a></li>
+                        <li><a href="#"><i class="bi bi-box-arrow-up-right me-1 small"></i> Ketahanan Pangan</a></li>
+                        <li><a href="#"><i class="bi bi-download me-1 small"></i> Download Dokumen</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="fw-bold text-white mb-3 pb-1 border-bottom d-inline-block" style="border-color: #334155 !important;">Kontak Kantor</h6>
+                    <ul class="list-unstyled mb-0 d-flex flex-column gap-2" style="color: #94a3b8; font-size: 0.8rem;">
+                        <li class="d-flex gap-2">
+                            <i class="bi bi-geo-alt-fill text-warning"></i>
+                            <span>Jl. Raya Jalatrang No. 01, Kec. Cipaku, Kab. Ciamis, Jawa Barat 46252</span>
+                        </li>
+                        <li class="d-flex gap-2 align-items-center">
+                            <i class="bi bi-telephone-fill text-warning"></i>
+                            <span>(0265) 1234567</span>
+                        </li>
+                        <li class="d-flex gap-2 align-items-center">
+                            <i class="bi bi-envelope-fill text-warning"></i>
+                            <span>pemdes@jalatrang.id</span>
+                        </li>
+                        <li class="d-flex gap-2 align-items-center">
+                            <i class="bi bi-clock-fill text-warning"></i>
+                            <span>Senin - Jumat: 08.00 - 15.30 WIB</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="row mt-4 pt-3 border-top" style="border-color: #1e293b !important; font-size: 0.75rem;">
+                <div class="col-md-6 text-center text-md-start mb-2 mb-md-0" style="color: #64748b;">
+                    &copy; {{ date('Y') }} Pemerintah Desa Jalatrang. All rights reserved.
+                </div>
+                <div class="col-md-6 text-center text-md-end" style="color: #64748b;">
+                    Dikembangkan untuk Portal Informasi Resmi Desa Jalatrang
                 </div>
             </div>
         </div>
